@@ -1,0 +1,25 @@
+{
+  "importOrder": [
+    "^[/]",
+    "^@/components/(.*)$",
+    "^@/lib/(.*)$",
+    "^@/utils/(.*)$",
+    "^@/analytics/(.*)$",
+    "^@/configs/(.*)$",
+    "^@/generated/(.*)$",
+    "^@/graphql/(.*)$",
+    "^@/types/(.*)$",
+    "^@/constants/(.*)$",
+    "^@/mocks/(.*)$",
+    "^@/assets/(.*)$",
+    "^[.]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-packagejson"
+  ],
+  "endOfLine": "lf"
+}
