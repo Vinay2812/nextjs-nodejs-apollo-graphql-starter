@@ -1,38 +1,33 @@
+# dependencies
 node_modules
-# Keep environment variables out of version control
-.env
-.env.development.local
-.local.env
-.dev.env
-.staging.env
-.prod.env
 
-/src/logs
-logs
-/src/prisma/generated
-/src/generated/*
-/generated/*
+# env files
+.env
+.env.*.local
+!.env.example
+
+# build
 dist/
 
+# generated
+/src/prisma/generated
+/generated/*
+schema.graphql
 
+# logs
+/src/logs
+logs
+*.log
+
+# misc
+.DS_Store
 cache
 tmp
 dump
 
-/src/scripts/wp-user-table1.json
+# lock files
+bun.lock
 
-dockerfile
-
-.DS_store
+# editor
 .idea
-
-# log files
-analytics.log
-notes/
-
 .claude/
-GEMINI.md
-.beads/ 
-
-/generated/prisma
-/prisma/generated

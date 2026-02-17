@@ -1,6 +1,19 @@
-.env*
+# env files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# dependencies
 node_modules
+
+# build
 dist
 build
 .next
+
+# lock files
 bun.lock
+
+# misc
+.DS_Store

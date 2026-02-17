@@ -11,25 +11,50 @@ const config: CodegenConfig = {
       },
     },
   ],
-  documents: ["src/graphql/*.ts", "!src/graphql/generated/**/*/"],
+  documents: ["src/graphql/**/*.ts", "!src/graphql/generated/**/*/"],
   generates: {
+    // Types only - safe for server components
+    "src/graphql/generated/types.ts": {
+      plugins: ["typescript", "typescript-operations"],
+      config: {
+        skipTypename: true,
+        scalars: {
+          DateTime: {
+            input: "string",
+            output: "Date | string",
+          },
+        },
+      },
+    },
+    // Combined file for backwards compatibility (client-only)
     "src/graphql/generated/graphql.ts": {
       plugins: [
+        {
+          add: {
+            content: '/* eslint-disable */\n// @ts-nocheck\n"use client";',
+          },
+        },
         "typescript",
         "typescript-operations",
         "typescript-react-apollo",
       ],
       config: {
         skipTypename: true,
-        // Apollo Client 4 exports hooks and types from @apollo/client/react, not @apollo/client
+        scalars: {
+          DateTime: {
+            input: "string",
+            output: "Date | string",
+          },
+        },
+        // Apollo Client 4.x: All React types and hooks are in @apollo/client/react
+        apolloReactCommonImportFrom: "@apollo/client/react",
         apolloReactHooksImportFrom: "@apollo/client/react",
-        apolloReactApolloClientImportFrom: "@apollo/client",
-        apolloReactApolloClientTypesImportFrom: "@apollo/client/react",
-        apolloReactApolloClientHooksImportFrom: "@apollo/client/react",
-        apolloReactApolloClientHooksTypesImportFrom: "@apollo/client/react",
-      },
-      presetConfig: {
-        gqlTagName: "gql",
+        // Disable incompatible features for Apollo Client 4.x
+        addSuspenseQuery: false,
+        withSuspenseQuery: false,
+        withMutationFn: false,
+        withMutationOptionsType: false,
+        withResultType: false,
       },
     },
   },

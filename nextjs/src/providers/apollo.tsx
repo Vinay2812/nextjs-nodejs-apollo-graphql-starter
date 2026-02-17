@@ -7,40 +7,49 @@ import {
   ApolloNextAppProvider,
   InMemoryCache,
 } from "@apollo/client-integration-nextjs";
+import { SetContextLink } from "@apollo/client/link/context";
+import { useAuth } from "@clerk/nextjs";
 
-function makeApolloClient() {
-  try {
-    const httpLink = new HttpLink({
-      uri: GRAPHQL_ENDPOINT,
-      credentials: "include",
+function makeApolloClient(getToken: () => Promise<string | null>) {
+  const httpLink = new HttpLink({
+    uri: GRAPHQL_ENDPOINT,
+    credentials: "include",
+    headers: {
+      origin: DOMAIN,
+    },
+  });
+
+  const authLink = new SetContextLink(async ({ headers }) => {
+    const token = await getToken();
+    return {
       headers: {
-        origin: DOMAIN,
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
       },
-    });
+    };
+  });
 
-    return new ApolloClient({
-      cache: new InMemoryCache(),
-      link: httpLink,
-      defaultOptions: {
-        watchQuery: {
-          fetchPolicy: "cache-and-network",
-          errorPolicy: "ignore",
-        },
-        query: {
-          fetchPolicy: "network-only",
-          errorPolicy: "all",
-        },
+  return new ApolloClient({
+    cache: new InMemoryCache(),
+    link: authLink.concat(httpLink),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: "cache-and-network",
+        errorPolicy: "ignore",
       },
-    });
-  } catch (error) {
-    console.error("[Apollo] Error initializing Apollo Client", error);
-    throw error;
-  }
+      query: {
+        fetchPolicy: "network-only",
+        errorPolicy: "all",
+      },
+    },
+  });
 }
 
 export function ApolloProvider({ children }: React.PropsWithChildren) {
+  const { getToken } = useAuth();
+
   return (
-    <ApolloNextAppProvider makeClient={makeApolloClient}>
+    <ApolloNextAppProvider makeClient={() => makeApolloClient(getToken)}>
       {children}
     </ApolloNextAppProvider>
   );

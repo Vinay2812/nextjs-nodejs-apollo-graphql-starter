@@ -5,33 +5,47 @@ import {
   InMemoryCache,
   registerApolloClient,
 } from "@apollo/client-integration-nextjs";
+import { SetContextLink } from "@apollo/client/link/context";
+import { auth } from "@clerk/nextjs/server";
 
 export const { getClient, query: apolloClient } = registerApolloClient(() => {
-  try {
-    const httpLink = new HttpLink({
-      uri: GRAPHQL_ENDPOINT,
-      credentials: "include",
-      headers: {
-        origin: DOMAIN,
-      },
-    });
+  const httpLink = new HttpLink({
+    uri: GRAPHQL_ENDPOINT,
+    credentials: "include",
+    headers: {
+      origin: DOMAIN,
+    },
+  });
 
-    return new ApolloClient({
-      cache: new InMemoryCache(),
-      link: httpLink,
-      defaultOptions: {
-        watchQuery: {
-          fetchPolicy: "cache-and-network",
-          errorPolicy: "ignore",
+  const authLink = new SetContextLink(async ({ headers }) => {
+    try {
+      const { getToken } = await auth();
+      const token = await getToken();
+
+      return {
+        headers: {
+          ...headers,
+          authorization: token ? `Bearer ${token}` : "",
         },
-        query: {
-          fetchPolicy: "network-only",
-          errorPolicy: "all",
-        },
+      };
+    } catch {
+      // auth() might fail outside of request context
+      return { headers };
+    }
+  });
+
+  return new ApolloClient({
+    cache: new InMemoryCache(),
+    link: authLink.concat(httpLink),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: "cache-and-network",
+        errorPolicy: "ignore",
       },
-    });
-  } catch (error) {
-    console.error("[Apollo] Error initializing Apollo Client", error);
-    throw error;
-  }
+      query: {
+        fetchPolicy: "network-only",
+        errorPolicy: "all",
+      },
+    },
+  });
 });

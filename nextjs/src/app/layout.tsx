@@ -15,9 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Poetry & Pottery",
-  description:
-    "Poetry & Pottery is a platform for buying and selling pottery and poetry.",
+  title: "My App",
+  description: "A full-stack Next.js + GraphQL application.",
 };
 
 export default function RootLayout({
