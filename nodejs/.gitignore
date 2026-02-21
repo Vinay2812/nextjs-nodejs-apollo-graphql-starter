@@ -12,7 +12,6 @@ dist/
 # generated
 /src/prisma/generated
 /generated/*
-schema.graphql
 
 # logs
 /src/logs
@@ -24,9 +23,6 @@ logs
 cache
 tmp
 dump
-
-# lock files
-bun.lock
 
 # editor
 .idea

@@ -45,9 +45,6 @@ next-env.d.ts
 src/graphql/generated/
 prisma/generated
 
-# lock files
-bun.lock
-
 # editor
 .idea
 .claude/
